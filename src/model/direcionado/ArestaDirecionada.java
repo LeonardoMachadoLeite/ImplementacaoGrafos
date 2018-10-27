@@ -1,5 +1,7 @@
 package model.direcionado;
 
+import exceptions.VerticeNaoTemRelacaoComAresta;
+
 public class ArestaDirecionada {
 
     private final VerticeDirecionado inicio;
@@ -28,5 +30,17 @@ public class ArestaDirecionada {
     public int getPeso() {
         return peso;
     }
+
+    //Metodos basicos
+    public VerticeDirecionado verticeOposto(VerticeDirecionado vertice) throws VerticeNaoTemRelacaoComAresta {
+        if (vertice.equals(inicio)) {
+            return fim;
+        } else if (vertice.equals(fim)) {
+            return inicio;
+        } else {
+            throw new VerticeNaoTemRelacaoComAresta(vertice.getNome());
+        }
+    }
+
 
 }

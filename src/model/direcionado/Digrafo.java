@@ -101,4 +101,21 @@ public class Digrafo {
         }
         return this.arvoreConvergencia.get(this.conjuntoVertices.get(nomeVertice)).size();
     }
+
+    //Metodos basicos
+    public LinkedList<VerticeDirecionado> getDivergentes(VerticeDirecionado v) {
+        LinkedList<VerticeDirecionado> listaDivergentes = new LinkedList<>();
+        for (ArestaDirecionada a : this.arvoreDivergencia.get(v)) {
+            listaDivergentes.add(v);
+        }
+        return listaDivergentes;
+    }
+
+    public LinkedList<VerticeDirecionado> getConvergentes(VerticeDirecionado v) {
+        LinkedList<VerticeDirecionado> listaConvergentes = new LinkedList<>();
+        for (ArestaDirecionada a : this.arvoreConvergencia.get(v)) {
+            listaConvergentes.add(v);
+        }
+        return listaConvergentes;
+    }
 }

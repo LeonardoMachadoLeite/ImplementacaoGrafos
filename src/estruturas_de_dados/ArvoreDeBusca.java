@@ -3,6 +3,7 @@ package estruturas_de_dados;
 import model.nao_direcionado.Vertice;
 
 import java.util.LinkedList;
+import java.util.TreeMap;
 
 public class ArvoreDeBusca {
 
@@ -10,9 +11,12 @@ public class ArvoreDeBusca {
     private No raiz;
     private int size = 0;
     private int peso = 0;
+    private TreeMap<Vertice, No> NoDosVertices;
 
     //Construtor
-    public ArvoreDeBusca() {}
+    public ArvoreDeBusca() {
+        this.NoDosVertices = new TreeMap<>();
+    }
     public ArvoreDeBusca(No raiz) {
         this.raiz = raiz;
     }
@@ -32,9 +36,23 @@ public class ArvoreDeBusca {
 
     //Metodos
     public No adicionarFilho(Vertice vertice, No pai) {
-        return pai.adicionarFilho(vertice);
+        if (pai == null) {
+            this.raiz = new No(vertice,null);
+            this.NoDosVertices.put(vertice, this.raiz);
+            return this.raiz;
+        }
+        No novoNo = pai.adicionarFilho(vertice);
+        this.NoDosVertices.put(vertice, novoNo);
+        return novoNo;
     }
 
+    public No getNo(Vertice v) {
+        return this.NoDosVertices.get(v);
+    }
+
+    public boolean contains(Vertice v) {
+        return this.NoDosVertices.containsKey(v);
+    }
     private class No {
 
         //Atributos
@@ -45,6 +63,7 @@ public class ArvoreDeBusca {
         //Construtor
         public No(Vertice vertice, No pai) {
             this.vertice = vertice;
+            this.pai = pai;
             this.filhos = new LinkedList<>();
         }
 

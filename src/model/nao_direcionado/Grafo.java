@@ -1,5 +1,6 @@
 package model.nao_direcionado;
 
+import estruturas_de_dados.ArvoreDeBusca;
 import estruturas_de_dados.FilaEncadeada;
 import estruturas_de_dados.FilaVaziaException;
 import estruturas_de_dados.PilhaEncadeada;
@@ -144,6 +145,7 @@ public class Grafo {
         }
     }
 
+    //Ordena os vertices em distancia do vertice inicial. Assim, os mais próximos estarão no início.
     public LinkedList<Vertice> ordenarVertices(Vertice v) {
         FilaEncadeada<Vertice> F = new FilaEncadeada<>();
         LinkedList<Vertice> verticesOrdenados = new LinkedList<>();
@@ -168,6 +170,28 @@ public class Grafo {
             }
         } catch (FilaVaziaException e) {}
         return verticesOrdenados;
+    }
+
+    public ArvoreDeBusca buscaEmProfundidade(Vertice v) {
+        ArvoreDeBusca arvoreDeBusca = new ArvoreDeBusca();
+        PilhaEncadeada<Vertice> P = new PilhaEncadeada<>();
+        arvoreDeBusca.adicionarFilho(v,null);
+        P.empilhar(v);
+
+        while (!P.vazia()) {
+            Vertice topo = P.desempilhar();
+            Iterator<Vertice> adjacentes = getAdjacentes(topo).iterator();
+            while (adjacentes.hasNext()) {
+                Vertice w = adjacentes.next();
+                if (!arvoreDeBusca.contains(w)) {
+                    arvoreDeBusca.adicionarFilho(w, arvoreDeBusca.getNo(topo));
+                    P.empilhar(w);
+                }
+            }
+
+        }
+
+        return arvoreDeBusca;
     }
 
     //Metodos de Arvore Minima(Falta substituir tree map por uma arvore personalizada)
