@@ -2,10 +2,11 @@ package estruturas_de_dados;
 
 import model.nao_direcionado.Vertice;
 
+import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.TreeMap;
 
-public class ArvoreDeBusca {
+public class ArvoreDeBusca implements Iterable<Vertice>{
 
     //Atributos
     private No raiz;
@@ -36,7 +37,7 @@ public class ArvoreDeBusca {
 
     //Metodos
     public No adicionarFilho(Vertice vertice, No pai) {
-        if (pai == null) {
+        if (this.raiz == null) {
             this.raiz = new No(vertice,null);
             this.NoDosVertices.put(vertice, this.raiz);
             return this.raiz;
@@ -53,6 +54,72 @@ public class ArvoreDeBusca {
     public boolean contains(Vertice v) {
         return this.NoDosVertices.containsKey(v);
     }
+
+    public LinkedList<Vertice> articulacoes() {
+        LinkedList<Vertice> articulacoes = new LinkedList<>();
+
+        if (this.raiz.filhos.size() > 1) {
+            articulacoes.add(this.raiz.vertice);
+        }
+
+        for (No no : this.raiz.filhos) {
+            testarSubarvore(articulacoes, new LinkedList<>(), no);
+        }
+
+        return articulacoes;
+    }
+
+    private boolean testarSubarvore(LinkedList<Vertice> articulacoes, LinkedList<Vertice> ancestrais, No raizDaSubarvore) {
+        ArvoreDeBusca subarvore = new ArvoreDeBusca(raizDaSubarvore);
+        LinkedList<Vertice> ancestraisDaSubarvore = (LinkedList<Vertice>) ancestrais.clone();
+        ancestraisDaSubarvore.addLast(raizDaSubarvore.vertice);
+
+        if (raizDaSubarvore.filhos.size() != 0) {
+            boolean articulacao = true;
+            for (No no : raizDaSubarvore.filhos) {
+                if (testarSubarvore(articulacoes,ancestraisDaSubarvore,no)) {
+                    articulacao = false;
+                    break;
+                }
+            }
+            if (articulacao) {
+                articulacoes.addLast(raizDaSubarvore.vertice);
+
+            }
+        }
+
+        for (Vertice a : ancestrais) {
+            if (a.isAdjacente(raizDaSubarvore.vertice)) {
+                return true;
+            }
+        }
+        return false;
+
+
+    }
+
+    public LinkedList<Vertice> buscaEmProfundidade() {
+        return null;
+    }
+
+    @Override
+    public Iterator<Vertice> iterator() {
+        return new Iterator<Vertice>() {
+
+
+
+            @Override
+            public boolean hasNext() {
+                return false;
+            }
+
+            @Override
+            public Vertice next() {
+                return null;
+            }
+        };
+    }
+
     private class No {
 
         //Atributos

@@ -1,11 +1,11 @@
 package model.direcionado;
 
 
+import exceptions.OrdencaoTopologicaException;
 import exceptions.VerticeJaExisteNoGrafoException;
 import exceptions.VerticeNaoEncontradoNoGrafo;
 
-import java.util.LinkedList;
-import java.util.TreeMap;
+import java.util.*;
 
 public class Digrafo {
 
@@ -19,6 +19,11 @@ public class Digrafo {
         this.arvoreConvergencia = new TreeMap<>();
         this.arvoreDivergencia = new TreeMap<>();
         this.conjuntoVertices = new TreeMap<>();
+    }
+    public Digrafo(Digrafo digrafo) {
+        this.conjuntoVertices = (TreeMap<String, VerticeDirecionado>) digrafo.conjuntoVertices.clone();
+        this.arvoreDivergencia = (TreeMap<VerticeDirecionado, LinkedList<ArestaDirecionada>>) digrafo.arvoreDivergencia.clone();
+        this.arvoreConvergencia = (TreeMap<VerticeDirecionado, LinkedList<ArestaDirecionada>>) digrafo.arvoreConvergencia.clone();
     }
 
     //Getters e Setters
@@ -103,6 +108,14 @@ public class Digrafo {
     }
 
     //Metodos basicos
+    public void removerVertice(String nomeVertice) {
+        VerticeDirecionado vertice = conjuntoVertices.get(nomeVertice);
+
+        arvoreConvergencia.remove(vertice);
+        arvoreDivergencia.remove(vertice);
+        conjuntoVertices.remove(nomeVertice);
+    }
+
     public LinkedList<VerticeDirecionado> getDivergentes(VerticeDirecionado v) {
         LinkedList<VerticeDirecionado> listaDivergentes = new LinkedList<>();
         for (ArestaDirecionada a : this.arvoreDivergencia.get(v)) {
@@ -117,5 +130,77 @@ public class Digrafo {
             listaConvergentes.add(v);
         }
         return listaConvergentes;
+    }
+
+    private VerticeDirecionado getVerticeGrau0() {
+
+        for (VerticeDirecionado i : arvoreConvergencia.keySet()) {
+
+            if (arvoreConvergencia.get(i).size() == 0) {
+                return i;
+            }
+
+        }
+
+        return null;
+    }
+
+    //Ordenação Topológica
+    public LinkedList<VerticeDirecionado> ordenacaoTopologica() throws OrdencaoTopologicaException {
+        LinkedList<VerticeDirecionado> ordem = new LinkedList<>();
+
+        Digrafo copia = new Digrafo(this);
+        VerticeDirecionado grau0 = copia.getVerticeGrau0();
+
+        while (grau0 != null) {
+
+            copia.removerVertice(grau0.getNome());
+            ordem.addLast(grau0);
+            grau0 = copia.getVerticeGrau0();
+
+        }
+
+        if (copia.conjuntoVertices.size() != 0) {
+            throw new OrdencaoTopologicaException("Nao eh possivel ordenar este grafo, pois ele apresenta ciclos.");
+        }
+
+        return ordem;
+    }
+
+    public LinkedList<VerticeDirecionado> buscaEmProfundidade() {
+        LinkedList<VerticeDirecionado> posOrdem = new LinkedList<>();
+
+        TreeSet<VerticeDirecionado> verticesAindaNaoPercorridos = new TreeSet<>(this.conjuntoVertices.values());
+        VerticeDirecionado verticeAtual = verticesAindaNaoPercorridos.pollFirst();
+        Stack<VerticeDirecionado> pilha = new Stack<>(), pilhaPosOrdem = new Stack<>();
+        pilha.push(verticeAtual);
+        posOrdem.addLast(verticeAtual);
+
+        while (verticesAindaNaoPercorridos.size() > 0) {
+
+            for (VerticeDirecionado v : getDivergentes(verticeAtual)) {
+                if (!verticesAindaNaoPercorridos.contains(v)) {
+                    pilha.push(v);
+                    pilhaPosOrdem.push(v);
+                }
+            }
+
+            if (!pilha.empty()) {
+                verticeAtual = pilha.pop();
+                verticesAindaNaoPercorridos.remove(verticeAtual);
+            } else {
+                verticeAtual = verticesAindaNaoPercorridos.pollFirst();
+            }
+
+        }
+
+        return posOrdem;
+    }
+
+    //Componentes Fortemente Conexos
+    public LinkedList<LinkedList<VerticeDirecionado>> componentesFortementeConexos() {
+
+
+        return null;
     }
 }
