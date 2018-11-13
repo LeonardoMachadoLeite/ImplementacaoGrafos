@@ -322,7 +322,7 @@ public class Grafo {
     public LinkedList<Vertice> buscaDeArticulacoes() {
         Vertice verticeInicial = this.conjuntoVertices.values().iterator().next();
         ArvoreDeBusca arvoreDeBusca = this.buscaEmProfundidade(verticeInicial);
-
-        return null;
+        System.out.println(arvoreDeBusca);
+        return arvoreDeBusca.articulacoes();
     }
 }

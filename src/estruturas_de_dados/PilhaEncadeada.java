@@ -98,4 +98,21 @@ public class PilhaEncadeada<T> implements Iterable<T> {
         }
         
     }
+
+    @Override
+    public String toString() {
+        StringBuilder ans = new StringBuilder();
+        boolean first = true;
+        ans.append("[");
+        for (T i : this) {
+            if (!first) {
+                ans.append(", ");
+            } else {
+                first = false;
+            }
+            ans.append(i.toString());
+        }
+        ans.append("]");
+        return ans.toString();
+    }
 }

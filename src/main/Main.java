@@ -3,6 +3,9 @@ package main;
 import model.nao_direcionado.Caminho;
 import model.nao_direcionado.GerenciadorCaminhos;
 import model.nao_direcionado.Grafo;
+import model.nao_direcionado.Vertice;
+
+import java.util.LinkedList;
 
 
 public class Main {
@@ -10,13 +13,9 @@ public class Main {
     public static void main(String[] args) throws Exception{
         Grafo grafoTeste = grafoBusca();
 
-        grafoTeste.getAdjacentes(grafoTeste.getVertice("V1"));
-        boolean ehRegular = grafoTeste.ehRegular();
-        boolean ehCompleto = grafoTeste.ehCompleto();
-        boolean ehConexo = grafoTeste.ehConexo(grafoTeste.getVertice("V1"));
+        LinkedList<Vertice> articulacoes =  grafoTeste.buscaDeArticulacoes();
 
-        Caminho menorCaminho = grafoTeste.algoritmoDijkstra(grafoTeste.getVertice("V1"), grafoTeste.getVertice("V7"));
-        GerenciadorCaminhos gc = grafoTeste.algoritmoDijkstra(grafoTeste.getVertice("V1"));
+        System.out.println(articulacoes);
     }
 
     public static Grafo grafoBusca() {
