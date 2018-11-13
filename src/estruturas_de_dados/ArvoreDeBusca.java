@@ -2,6 +2,7 @@ package estruturas_de_dados;
 
 import model.nao_direcionado.Vertice;
 
+import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.TreeMap;
@@ -19,6 +20,7 @@ public class ArvoreDeBusca implements Iterable<Vertice>{
         this.NoDosVertices = new TreeMap<>();
     }
     public ArvoreDeBusca(No raiz) {
+        this();
         this.raiz = raiz;
     }
 
@@ -48,6 +50,9 @@ public class ArvoreDeBusca implements Iterable<Vertice>{
     }
 
     public No getNo(Vertice v) {
+        if (v == null) {
+            return null;
+        }
         return this.NoDosVertices.get(v);
     }
 
@@ -69,20 +74,44 @@ public class ArvoreDeBusca implements Iterable<Vertice>{
 
                 No noAtual = this.NoDosVertices.get(v);
 
-                if (noAtual.filhos.size() == 0) {
-                    continue;
-                } else {
+                if (noAtual.filhos.size() != 0) {
                     //No Interno
+                    ArrayList<Boolean> ehAdjacente = new ArrayList(noAtual.filhos.size());
+                    for (int i = 0; i < noAtual.filhos.size();i++) {
+                        ehAdjacente.add(false);
+                    }
                     for (Vertice ancestral : noAtual.ancestrais) {
+                        int indiceFilho = 0;
                         for (No raizDaSubarvore : noAtual.filhos) {
-                            IteradorProfundidade itr = new IteradorProfundidade(raizDaSubarvore);
-                            while (itr.hasNext()) {
-                                Vertice verticeDescendente = itr.next();
-                                if (verticeDescendente.isAdjacente(ancestral)) {
-
+                            if (!ehAdjacente.get(indiceFilho)) {
+                                IteradorProfundidade itr = new IteradorProfundidade(raizDaSubarvore);
+                                while (itr.hasNext()) {
+                                    Vertice verticeDescendente = itr.next();
+                                    if (verticeDescendente.isAdjacente(ancestral)) {
+                                        ehAdjacente.set(indiceFilho,true);
+                                    }
                                 }
+                                indiceFilho++;
                             }
                         }
+                        boolean naoEhArticulacao = true;
+                        for (boolean i : ehAdjacente) {
+                            if (!i) {
+                                naoEhArticulacao = false;
+                            }
+                        }
+                        if (naoEhArticulacao) {
+                            break;
+                        }
+                    }
+                    boolean naoEhArticulacao = true;
+                    for (boolean i : ehAdjacente) {
+                        if (!i) {
+                            naoEhArticulacao = false;
+                        }
+                    }
+                    if (!naoEhArticulacao) {
+                        articulacoes.add(v);
                     }
                 }
             }
@@ -200,10 +229,12 @@ public class ArvoreDeBusca implements Iterable<Vertice>{
         public No adicionarFilho(Vertice vertice) {
             No novoNo;
             if (this.pai == null) {
-                novoNo = new No(vertice, this, new LinkedList<>());
+                LinkedList<Vertice> ancestrais = new LinkedList<>();
+                ancestrais.addLast(this.vertice);
+                novoNo = new No(vertice, this, ancestrais);
             } else {
                 LinkedList<Vertice> ancestrais = (LinkedList<Vertice>) this.ancestrais.clone();
-                ancestrais.addLast(this.pai.vertice);
+                ancestrais.addLast(this.vertice);
                 novoNo = new No(vertice, this, ancestrais);
             }
             this.filhos.addLast(novoNo);
@@ -215,7 +246,7 @@ public class ArvoreDeBusca implements Iterable<Vertice>{
             if (this.ehFolha()) {
                 return this.vertice.toString();
             } else {
-                return String.format("%s{%s}",this.vertice.toString(),this.filhos);
+                return String.format("%s{ %s }",this.vertice.toString(),this.filhos);
             }
         }
     }

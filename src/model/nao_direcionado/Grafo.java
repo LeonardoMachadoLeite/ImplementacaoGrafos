@@ -175,16 +175,20 @@ public class Grafo {
     public ArvoreDeBusca buscaEmProfundidade(Vertice v) {
         ArvoreDeBusca arvoreDeBusca = new ArvoreDeBusca();
         PilhaEncadeada<Vertice> P = new PilhaEncadeada<>();
+        HashMap<Vertice,Vertice>  mapaPai = new HashMap<>();
         arvoreDeBusca.adicionarFilho(v,null);
         P.empilhar(v);
 
         while (!P.vazia()) {
             Vertice topo = P.desempilhar();
+            if (!arvoreDeBusca.contains(topo)) {
+                arvoreDeBusca.adicionarFilho(topo,arvoreDeBusca.getNo(mapaPai.get(topo)));
+            }
             Iterator<Vertice> adjacentes = getAdjacentes(topo).iterator();
             while (adjacentes.hasNext()) {
                 Vertice w = adjacentes.next();
                 if (!arvoreDeBusca.contains(w)) {
-                    arvoreDeBusca.adicionarFilho(w, arvoreDeBusca.getNo(topo));
+                    mapaPai.put(w, topo);
                     P.empilhar(w);
                 }
             }
