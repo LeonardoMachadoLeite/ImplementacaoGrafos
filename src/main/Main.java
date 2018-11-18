@@ -1,5 +1,7 @@
 package main;
 
+import model.direcionado.Digrafo;
+import model.direcionado.VerticeDirecionado;
 import model.nao_direcionado.Caminho;
 import model.nao_direcionado.GerenciadorCaminhos;
 import model.nao_direcionado.Grafo;
@@ -11,11 +13,13 @@ import java.util.LinkedList;
 public class Main {
 
     public static void main(String[] args) throws Exception{
-        Grafo grafoTeste = grafoBusca();
+        Digrafo digrafo = digrafoForteConexo();
 
-        LinkedList<Vertice> articulacoes =  grafoTeste.buscaDeArticulacoes();
+        LinkedList<LinkedList<VerticeDirecionado>> listaComponentes = digrafo.componentesFortementeConexos();
 
-        System.out.println(articulacoes);
+        for (LinkedList<VerticeDirecionado> componente : listaComponentes) {
+            System.out.println(componente);
+        }
     }
 
     public static Grafo grafoBusca() {
@@ -56,4 +60,16 @@ public class Main {
         return grafo;
     }
 
+    public static Digrafo digrafoForteConexo() {
+        Digrafo digrafo = new Digrafo();
+
+        digrafo.addV("1").addV("2").addV("3").addV("4").addV("5").addV("6").addV("7").addV("8").addV("9").addV("10").addV("11");
+
+        digrafo.addA("1","2").addA("2","3").addA("3","1").addA("3","4")
+                .addA("4","3").addA("4","5").addA("4","6").addA("6","5")
+                .addA("6","7").addA("5","7").addA("7","8").addA("8","6")
+                .addA("8","9").addA("9","10").addA("10","11").addA("11","9");
+
+        return digrafo;
+    }
 }

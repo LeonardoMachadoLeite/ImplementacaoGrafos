@@ -32,14 +32,8 @@ public class ArestaDirecionada {
     }
 
     //Metodos basicos
-    public VerticeDirecionado verticeOposto(VerticeDirecionado vertice) throws VerticeNaoTemRelacaoComAresta {
-        if (vertice.equals(inicio)) {
-            return fim;
-        } else if (vertice.equals(fim)) {
-            return inicio;
-        } else {
-            throw new VerticeNaoTemRelacaoComAresta(vertice.getNome());
-        }
+    public ArestaDirecionada arestaInversa() {
+        return new ArestaDirecionada(this.fim,this.inicio);
     }
 
 

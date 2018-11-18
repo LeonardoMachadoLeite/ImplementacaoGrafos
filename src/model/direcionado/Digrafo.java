@@ -26,6 +26,22 @@ public class Digrafo {
         this.arvoreConvergencia = (TreeMap<VerticeDirecionado, LinkedList<ArestaDirecionada>>) digrafo.arvoreConvergencia.clone();
     }
 
+    public Digrafo DigrafoInvertido() {
+        Digrafo digrafoInvertido = new Digrafo();
+
+        for (VerticeDirecionado v : this.conjuntoVertices.values()) {
+            digrafoInvertido.addV(v.getNome());
+        }
+
+        for (LinkedList<ArestaDirecionada> list : this.arvoreConvergencia.values()) {
+            for (ArestaDirecionada a : list) {
+                digrafoInvertido.addA(a.getFim().getNome(),a.getInicio().getNome());
+            }
+        }
+
+        return digrafoInvertido;
+    }
+
     //Getters e Setters
     public TreeMap<VerticeDirecionado, LinkedList<ArestaDirecionada>> getArvoreDivergencia() {
         return arvoreDivergencia;
@@ -119,7 +135,7 @@ public class Digrafo {
     public LinkedList<VerticeDirecionado> getDivergentes(VerticeDirecionado v) {
         LinkedList<VerticeDirecionado> listaDivergentes = new LinkedList<>();
         for (ArestaDirecionada a : this.arvoreDivergencia.get(v)) {
-            listaDivergentes.add(v);
+            listaDivergentes.add(a.getFim());
         }
         return listaDivergentes;
     }
@@ -127,7 +143,7 @@ public class Digrafo {
     public LinkedList<VerticeDirecionado> getConvergentes(VerticeDirecionado v) {
         LinkedList<VerticeDirecionado> listaConvergentes = new LinkedList<>();
         for (ArestaDirecionada a : this.arvoreConvergencia.get(v)) {
-            listaConvergentes.add(v);
+            listaConvergentes.add(a.getInicio());
         }
         return listaConvergentes;
     }
@@ -167,29 +183,36 @@ public class Digrafo {
         return ordem;
     }
 
-    public LinkedList<VerticeDirecionado> buscaEmProfundidade() {
-        LinkedList<VerticeDirecionado> posOrdem = new LinkedList<>();
+    public Queue<VerticeDirecionado> buscaEmProfundidade() {
+        Scanner scan = new Scanner(System.in);
 
         TreeSet<VerticeDirecionado> verticesAindaNaoPercorridos = new TreeSet<>(this.conjuntoVertices.values());
         VerticeDirecionado verticeAtual = verticesAindaNaoPercorridos.pollFirst();
-        Stack<VerticeDirecionado> pilha = new Stack<>(), pilhaPosOrdem = new Stack<>();
+        Stack<VerticeDirecionado> pilha = new Stack<>();
+        Queue<VerticeDirecionado> posOrdem = new LinkedList<>();
         pilha.push(verticeAtual);
-        posOrdem.addLast(verticeAtual);
+        posOrdem.add(verticeAtual);
 
         while (verticesAindaNaoPercorridos.size() > 0) {
-
-            for (VerticeDirecionado v : getDivergentes(verticeAtual)) {
-                if (!verticesAindaNaoPercorridos.contains(v)) {
-                    pilha.push(v);
-                    pilhaPosOrdem.push(v);
-                }
-            }
 
             if (!pilha.empty()) {
                 verticeAtual = pilha.pop();
                 verticesAindaNaoPercorridos.remove(verticeAtual);
             } else {
                 verticeAtual = verticesAindaNaoPercorridos.pollFirst();
+            }
+
+            //System.out.println("vertice atual: " + verticeAtual.getNome());
+            //System.out.println("Pilha : " + pilha);
+            //System.out.println("Não Percorridos: " + verticesAindaNaoPercorridos);
+            //scan.next();
+            for (VerticeDirecionado v : getDivergentes(verticeAtual)) {
+                //System.out.println("Vertice Divegente atual: " + v);
+                if (verticesAindaNaoPercorridos.contains(v) && !pilha.contains(v)) {
+                    //System.out.println("Vertice foi adicionado na pilha");
+                    pilha.push(v);
+                    posOrdem.add(v);
+                }
             }
 
         }
@@ -199,8 +222,43 @@ public class Digrafo {
 
     //Componentes Fortemente Conexos
     public LinkedList<LinkedList<VerticeDirecionado>> componentesFortementeConexos() {
+        Queue<VerticeDirecionado> posOrdem = (Queue<VerticeDirecionado>) this.buscaEmProfundidade();
 
+        Digrafo digrafoInvertido = this.DigrafoInvertido();
 
-        return null;
+        LinkedList<LinkedList<VerticeDirecionado>> listaComponentes = new LinkedList<>();
+
+        while (!posOrdem.isEmpty()) {
+            VerticeDirecionado verticeAtual = posOrdem.poll();
+
+            if (listaComponentes.isEmpty() || (!listaComponentes.getLast().contains(verticeAtual) && !componenteConsegueAlcancarVertice(listaComponentes.getLast(), verticeAtual, digrafoInvertido))) {
+                listaComponentes.addLast(new LinkedList<>());
+            }
+
+            if (!listaComponentes.getLast().contains(verticeAtual)) {
+                listaComponentes.getLast().addLast(verticeAtual);
+            }
+
+            for (VerticeDirecionado v : digrafoInvertido.getDivergentes(verticeAtual)) {
+                if (!listaComponentes.getLast().contains(v) && posOrdem.contains(v)) {
+                    listaComponentes.getLast().addLast(v);
+                }
+            }
+
+        }
+
+        return listaComponentes;
     }
+
+    private boolean componenteConsegueAlcancarVertice(LinkedList<VerticeDirecionado> componente, VerticeDirecionado verticeAtual,
+                                                      Digrafo digrafoInvertido) {
+        LinkedList<VerticeDirecionado> convergentes = digrafoInvertido.getConvergentes(verticeAtual);
+        for (VerticeDirecionado v : componente) {
+            if (convergentes.contains(v)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
 }
