@@ -13,11 +13,15 @@ import java.util.LinkedList;
 public class Main {
 
     public static void main(String[] args) throws Exception{
+        Grafo grafo1 = grafoBusca();
+        Grafo grafo2 = grafoDistMin();
         Digrafo digrafo = digrafoForteConexo();
-
+        
+        
         LinkedList<LinkedList<VerticeDirecionado>> listaComponentes = digrafo.componentesFortementeConexos();
 
-        for (LinkedList<VerticeDirecionado> componente : listaComponentes) {
+        //for para imprimir cada componente
+        for (LinkedList<LinkedList<VerticeDirecionado>> componente : listaComponentes) {
             System.out.println(componente);
         }
     }
