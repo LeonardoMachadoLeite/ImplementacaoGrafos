@@ -21,7 +21,7 @@ public class Main {
         LinkedList<LinkedList<VerticeDirecionado>> listaComponentes = digrafo.componentesFortementeConexos();
 
         //for para imprimir cada componente
-        for (LinkedList<LinkedList<VerticeDirecionado>> componente : listaComponentes) {
+        for (LinkedList<VerticeDirecionado> componente : listaComponentes) {
             System.out.println(componente);
         }
     }
